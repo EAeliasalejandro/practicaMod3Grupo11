@@ -9,4 +9,3 @@ INSERT INTO credenciales (id_usuario, username, password_hash) VALUES
 (1, 'juan.perez1', 'hash_juan_perez'),
 (2, 'maria.lopez2', 'hash_maria_lopez'),
 (3, 'carlos.ruiz3', 'hash_carlos_ruiz');
-
