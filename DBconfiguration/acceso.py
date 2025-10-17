@@ -55,12 +55,51 @@ def obtener_datos_usuario(username, password):
     except Exception as e:
         print("Error al consultar la base de datos:", e)
 
+def insertar_usuario(nombre,correo,telefono,fechaNacimiento,username,contrasena):
+    conn = conectar_db()
+    if not conn:
+        return
+    try:
+        cursor = conn.cursor()
+        #generar la consulta sql
+        cursor.execute(
+            """
+            INSERT INTO usuarios (nombre, correo, telefono, fecha_nacimiento) VALUES 
+            (%s,%s,%s,%s) RETURNING id_usuario;
+            """, (nombre,correo,telefono,fechaNacimiento))
+        id_usuario = cursor.fetchone()[0]
+
+        cursor.execute(
+            """
+            INSERT INTO credenciales (id_usuario, username, password_hash) VALUES 
+            (%s,%s,%s);
+            """, (id_usuario,username,contrasena))
+        
+        conn.commit()
+        print("Usuario y la credencial se añadieron correctamente")
+
+    except Exception as e:
+        print("Error al insertar: ",e)
+        conn.rollback() #Revierte el cambio
+    finally:
+        cursor.close()
+        conn.close()
+
+
 if __name__ == "__main__":
-    print("Inicio de sesión en la base de datos")
-
+    #print("Inicio de sesión en la base de datos")
     # Solicitar credenciales al usuario
-    username = input("Ingrese su usuario: ")
-    password = getpass.getpass("Ingrese su contraseña: ")  # No muestra la contraseña al escribir
-
+    #username = input("Ingrese su usuario: ")
+    #password = getpass.getpass("Ingrese su contraseña: ")  # No muestra la contraseña al escribir
     # Consultar la base de datos
-    obtener_datos_usuario(username, password)
+    #obtener_datos_usuario(username, password)
+
+    print("Insertar usuario")
+    nombre = input("Ingresa Nombre del nuevo usuario")
+    correo = input("Ingresa correo del nuevo usuario")
+    telefono = input("Ingresa telefono del nuevo usuario")
+    fechaNacimiento = input("Ingresa fecha de nacimiento del nuevo usuario")
+    username = input("Ingresa username del nuevo usuario")
+    contrasena = input("Ingresa contraseña del nuevo usuario")
+
+    insertar_usuario(nombre,correo,telefono,fechaNacimiento,username,contrasena)
